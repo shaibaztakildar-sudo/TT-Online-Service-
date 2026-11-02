@@ -1,0 +1,6 @@
+{
+  "name": "TT Online Services",
+  "description": "Professional Indian Digital Document Assistance portal for PAN, Voter ID, Aadhaar guidance, certificates, and more.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

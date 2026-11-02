@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile document representing customers and admins",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "The user ID (auth UID)" },
+        "email": { "type": "string", "format": "email", "description": "The user email" },
+        "name": { "type": "string", "description": "The user full name" },
+        "phone": { "type": "string", "description": "The contact phone number" },
+        "role": { "type": "string", "enum": ["customer", "admin"], "description": "Role of the user" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp of creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last update" }
+      },
+      "required": ["id", "email", "name", "role", "createdAt", "updatedAt"]
+    },
+    "Application": {
+      "title": "Application",
+      "description": "Government document service assistance application submitted by a customer",
+      "type": "object",
+      "properties": {
+        "applicationId": { "type": "string", "description": "Unique tracking ID (e.g. TT-2026-XXXX)" },
+        "userId": { "type": "string", "description": "UID of the applicant customer" },
+        "customerName": { "type": "string", "description": "Applicant full name" },
+        "customerEmail": { "type": "string", "format": "email", "description": "Applicant email" },
+        "customerPhone": { "type": "string", "description": "Applicant phone number" },
+        "serviceId": { "type": "string", "description": "Selected service ID identifier" },
+        "serviceName": { "type": "string", "description": "Human readable service name" },
+        "applicationType": { "type": "string", "description": "Application type (e.g. New Application, Correction, Guidance)" },
+        "formData": { "type": "string", "description": "JSON string or formatted summary of applicant inputs" },
+        "status": {
+          "type": "string",
+          "enum": ["Pending", "Under Review", "Processing", "Completed", "Rejected", "Additional Information Required"],
+          "description": "Lifecycle status of the application"
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": ["Pending", "Paid", "Failed", "Refunded"],
+          "description": "Status of the service fee payment"
+        },
+        "paymentId": { "type": "string", "description": "Payment ID if paid" },
+        "paymentOrderId": { "type": "string", "description": "Payment order ID" },
+        "amountPaid": { "type": "number", "description": "Fee amount in INR" },
+        "consentGiven": { "type": "boolean", "description": "Whether explicit consent was granted by the applicant" },
+        "documentCount": { "type": "number", "description": "Number of attached documents" },
+        "adminNotes": { "type": "string", "description": "Processing notes added by operator" },
+        "additionalInfoRequested": { "type": "string", "description": "Specific information or documents requested by operator" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp of creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last update" }
+      },
+      "required": ["applicationId", "userId", "customerName", "serviceId", "serviceName", "status", "paymentStatus", "consentGiven", "createdAt", "updatedAt"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Payment transaction record for assistance service fee",
+      "type": "object",
+      "properties": {
+        "paymentId": { "type": "string", "description": "Unique transaction ID" },
+        "orderId": { "type": "string", "description": "Order ID" },
+        "applicationId": { "type": "string", "description": "Associated application ID" },
+        "userId": { "type": "string", "description": "UID of paying customer" },
+        "amount": { "type": "number", "description": "Amount in INR" },
+        "currency": { "type": "string", "enum": ["INR"], "description": "Currency code" },
+        "status": { "type": "string", "enum": ["SUCCESS", "PENDING", "FAILED"], "description": "Payment status" },
+        "razorpayPaymentId": { "type": "string", "description": "Razorpay payment ID" },
+        "razorpaySignature": { "type": "string", "description": "Razorpay signature verification" },
+        "receiptNumber": { "type": "string", "description": "Official receipt number" },
+        "serviceName": { "type": "string", "description": "Name of service" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp" }
+      },
+      "required": ["paymentId", "applicationId", "userId", "amount", "currency", "status", "receiptNumber", "serviceName", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Customer notification message for status changes and document requests",
+      "type": "object",
+      "properties": {
+        "notificationId": { "type": "string", "description": "Notification ID" },
+        "userId": { "type": "string", "description": "Target customer UID" },
+        "title": { "type": "string", "description": "Notification title" },
+        "message": { "type": "string", "description": "Notification message body" },
+        "applicationId": { "type": "string", "description": "Associated application ID" },
+        "read": { "type": "boolean", "description": "Read status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp" }
+      },
+      "required": ["notificationId", "userId", "title", "message", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles indexed by UID"
+    },
+    "/applications/{applicationId}": {
+      "schema": { "$ref": "#/entities/Application" },
+      "description": "Service applications submitted by users"
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/Payment" },
+      "description": "Payment records for verified assistance fees"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "In-app notifications for users"
+    }
+  }
+}
